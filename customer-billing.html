@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<style>
+    .container {
+        
+    }
+</style>
+</head>
+<body>
+
+<div class="container" style="background-color: powderblue;" style="width: 100%;">
+  <h2>Customer Billing</h2>
+  <div class="form-horizontal">
+    <div class="form-group">
+      <label class="control-label col-sm-2" for="email">Name:</label>
+      <div class="col-sm-6">
+        <input type="email" class="form-control" id="email" placeholder="Enter email" name="email">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="control-label col-sm-2" for="pwd">Phone:</label>
+      <div class="col-sm-6">          
+        <input type="password" class="form-control" id="pwd" placeholder="Enter password" name="pwd">
+      </div>
+    </div>
+    <div class="form-group">
+        <p style="margin-left: 220px;margin-bottom:4px;color: brown;">Enter Below Agent ID or Phone Number to fetch Agent Information</p>      
+        <label class="control-label col-sm-2" for="pwd">Agent ID / Phone No.:</label>
+        <div class="col-sm-6">   
+          <input id="agent_id" class="form-control" id="pwd" placeholder="Enter Agent ID or Phone No." name="pwd" required>
+        </div>
+        <div class="col-sm-4"> 
+          <button id="fetch_agent" class="btn btn-default">Fetch</button>
+        </div>  
+      </div>
+      <p style="margin-left: 220px;margin-bottom:4px;color: green;margin-top: -10px;
+      margin-left: 205px;" id="agent_found">Agent Found</p>
+      <p style="margin-left: 220px;margin-bottom:4px;color: green;margin-top: -10px;
+      margin-left: 205px;" id="agent_not_found">Agent Not Found</p>
+      <div class="form-group">
+        <label class="control-label col-sm-2" for="pwd">Amount:</label>
+        <div class="col-sm-6">          
+          <input type="number" class="form-control" id="amount" placeholder="Enter Amount" name="amt">
+        </div>
+      </div>
+      <div id="if_agent_found">
+        <div class="form-group">
+            <label class="control-label col-sm-2" for="pwd">Agent commission(%):</label>
+            <div class="col-sm-6">          
+              <input type="number" class="form-control" id="percentage" placeholder="Enter Amount" name="amt">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="pwd"></label>
+            <div class="col-sm-6"> 
+                <button id="calculate" class="btn btn-primary">Calculate</button>
+            </div>
+          </div>
+          <div class="form-group" id="agt_pft1">
+            <label class="control-label col-sm-2" for="pwd" style="color: green;">Agent Profit:</label>
+            <div class="col-sm-6">          
+                <div class="inner1" style="margin-top: 8px; "></div>
+            </div>
+          </div>
+          <div class="form-group" id="agt_pft2">
+            <label class="control-label col-sm-2" for="pwd" style="color: green;">Customer Payable:</label>
+            <div class="col-sm-6">          
+                <div class="inner2" style="margin-top: 8px; "></div>
+            </div>
+          </div>
+      </div>
+</div>
+</div>
+
+</body>
+<script>
+    $(document).ready(function() {
+    $('#agent_found').hide();
+    $('#agent_not_found').hide();
+    $('#if_agent_found').hide();
+    $('#agt_pft1').hide();
+    $('#agt_pft2').hide();
+    $("#calculate").click(()=> {
+        const amount = $('#amount').val();
+        const percentage = $('#percentage').val();
+        const share = ((amount * percentage) / 100 );
+        const cus_pay = amount - share;
+        if(share){
+            $('#agt_pft1').show();
+            $('#agt_pft2').show();
+            $('.inner1').html(`<div>${share}</div>`)
+            $('.inner2').html(`<div>${cus_pay}</div>`)
+        }
+    })
+    $('#fetch_agent').click(()=> {
+        const input = $('#agent_id').val();
+        console.log('ui input ', input);
+        $.ajax({
+            type: "POST",
+            url: "http://localhost:3000/customers/fetchAgent",
+            data: JSON.stringify({ 
+                input: input, 
+            }),
+            dataType: 'json',
+            contentType: 'application/json; charset=UTF-8',
+            success: function( data ) {
+                console.log('data--->', data);
+                if(data.agentExist){
+                    $('#agent_found').show();
+                    $('#agent_not_found').hide();
+                    $('#if_agent_found').show();
+                }else{
+                    $('#agent_found').hide();
+                    $('#agent_not_found').show();
+                    $('#if_agent_found').hide();
+                }
+            },
+            error: function( error ) {
+                console.log('error--->', error)
+            }
+        });
+    })
+  });
+</script>
+</html>
